@@ -74,6 +74,7 @@
             list-style: none;
             display: flex;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         nav ul li a {
@@ -302,6 +303,41 @@
             border-color: #c0392b;
         }
 
+        /* Estilos para la sección de Gemini */
+        .gemini-container {
+            max-width: 700px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .gemini-container textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-family: inherit;
+            font-size: 1rem;
+            margin-top: 20px;
+        }
+
+        #ai-response-container {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            min-height: 100px;
+            border: 1px solid #eee;
+            margin-top: 15px;
+            text-align: left;
+            white-space: pre-wrap; /* Mantiene los saltos de línea de la IA */
+        }
+        
+        #ai-button.loading {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
         /* Pie de Página */
         footer {
             background: var(--primary-color);
@@ -352,6 +388,7 @@
                 <li><a href="#instrumentos">Instrumentos</a></li>
                 <li><a href="#curiosidades">Curiosidades</a></li>
                 <li><a href="#quiz">Quiz</a></li>
+                <li><a href="#gemini-ai">Pregúntale a la IA</a></li>
             </ul>
         </div>
     </nav>
@@ -512,6 +549,20 @@
         </div>
     </section>
 
+    <!-- ========= NUEVA SECCIÓN DE GEMINI ========= -->
+    <section id="gemini-ai" class="container">
+        <h2>Pregúntale a la IA Experta</h2>
+        <p>¿Tienes alguna duda sobre la historia de la música? Escríbela aquí y nuestra IA te responderá.</p>
+        <div class="gemini-container">
+            <textarea id="ai-prompt" placeholder="Ej: ¿Qué es el contrapunto en el Barroco?"></textarea>
+            <button id="ai-button" class="btn">Preguntar a Gemini</button>
+            <div id="ai-response-container">
+                <div id="ai-response">Esperando tu pregunta...</div>
+            </div>
+        </div>
+    </section>
+    <!-- ========= FIN DE LA NUEVA SECCIÓN ========= -->
+
     <footer>
         <p>Proyecto educativo – Historia de la Música</p>
     </footer>
@@ -523,13 +574,11 @@
             timelineItems.forEach(item => {
                 const header = item.querySelector('.timeline-item-header');
                 header.addEventListener('click', () => {
-                    // Cierra todos los demás items
                     timelineItems.forEach(otherItem => {
                         if (otherItem !== item) {
                             otherItem.classList.remove('active');
                         }
                     });
-                    // Abre o cierra el item actual
                     item.classList.toggle('active');
                 });
             });
@@ -570,7 +619,8 @@
             let currentQuestionIndex = 0;
 
             function loadQuiz() {
-                quizContent.innerHTML = ''; // Limpiar contenido anterior
+                if (!quizContent) return;
+                quizContent.innerHTML = '';
                 const currentQuestion = quizData[currentQuestionIndex];
                 
                 const questionElement = document.createElement('div');
@@ -594,7 +644,7 @@
             function selectAnswer(liElement, selectedOption, correctAnswer) {
                 const options = quizContent.querySelectorAll('.options li');
                 options.forEach(opt => {
-                    opt.style.pointerEvents = 'none'; // Desactivar más clics
+                    opt.style.pointerEvents = 'none';
                     if (opt.textContent === correctAnswer) {
                         opt.classList.add('correct');
                     }
@@ -606,7 +656,6 @@
                     liElement.classList.add('incorrect');
                 }
 
-                // Cargar siguiente pregunta después de un tiempo
                 setTimeout(() => {
                     currentQuestionIndex++;
                     if (currentQuestionIndex < quizData.length) {
@@ -629,6 +678,57 @@
                 });
             });
         });
+
+        // ========= LÓGICA PARA LA API DE GEMINI (VERSIÓN SEGURA) =========
+
+        const aiButton = document.getElementById('ai-button');
+        const aiPrompt = document.getElementById('ai-prompt');
+        const aiResponse = document.getElementById('ai-response');
+
+        // ¡YA NO NECESITAMOS LA CLAVE API AQUÍ! LA HEMOS BORRADO.
+
+        const callGeminiAPI = async () => {
+            if (aiButton.classList.contains('loading')) return;
+
+            const promptText = aiPrompt.value;
+            if (!promptText) {
+                alert("Por favor, escribe una pregunta.");
+                return;
+            }
+
+            aiButton.innerText = "Pensando...";
+            aiButton.classList.add('loading');
+            aiResponse.innerText = "Enviando pregunta al experto...";
+
+            try {
+                // 1. Llamamos a NUESTRA PROPIA FUNCIÓN (el "mensajero secreto")
+                const response = await fetch('/.netlify/functions/ask-gemini', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: promptText }) // Enviamos la pregunta en el cuerpo
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error del servidor: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                // 2. Mostramos la respuesta que nos devolvió nuestra función
+                aiResponse.innerText = data.reply;
+
+            } catch (error) {
+                console.error("Error al llamar a la Netlify Function:", error);
+                aiResponse.innerText = "Lo siento, ha ocurrido un error. No se pudo contactar a la IA.";
+            } finally {
+                aiButton.innerText = "Preguntar a Gemini";
+                aiButton.classList.remove('loading');
+            }
+        };
+
+        aiButton.addEventListener('click', callGeminiAPI);
     </script>
 </body>
 </html>

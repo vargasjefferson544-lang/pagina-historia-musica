@@ -1,0 +1,74 @@
+[functions]
+  directory = "netlify/functions/"```
+
+Eso es todo. Este archivo le dice a Netlify: "Oye, mis funciones están en la carpeta `netlify/functions`".
+
+### **Paso 3: Escribir la Función del Servidor (`ask-gemini.js`)**
+
+Este es el código de nuestro "mensajero secreto".
+
+1.  Dentro de la carpeta `netlify/functions/`, crea un nuevo archivo llamado `ask-gemini.js`.
+2.  Pega el siguiente código en ese archivo. Este código es **JavaScript de servidor (Node.js)**, no de navegador.
+
+```javascript
+// Archivo: netlify/functions/ask-gemini.js
+
+exports.handler = async function (event, context) {
+  // Solo permitir peticiones POST
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: 'Method Not Allowed' };
+  }
+
+  try {
+    // 1. Obtener la pregunta del usuario desde el cuerpo de la petición
+    const { prompt } = JSON.parse(event.body);
+
+    if (!prompt) {
+      return { statusCode: 400, body: 'Por favor, proporciona una pregunta.' };
+    }
+    
+    // 2. Obtener la clave API secreta desde las variables de entorno de Netlify
+    const API_KEY = process.env.GEMINI_API_KEY;
+
+    // Mejoramos el prompt para darle contexto a la IA
+    const fullPrompt = `Eres un experto en historia de la música. Responde la siguiente pregunta de forma concisa y educativa, en español: "${prompt}"`;
+
+    // 3. Llamar a la API de Google (esto pasa en el servidor, de forma segura)
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        "contents": [{
+          "parts": [{
+            "text": fullPrompt
+          }]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Error en la respuesta de la API de Google');
+    }
+
+    const data = await response.json();
+    const geminiText = data.candidates[0].content.parts[0].text;
+
+    // 4. Devolver la respuesta de Gemini a la página web
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ reply: geminiText }),
+    };
+
+  } catch (error) {
+    console.error(error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Hubo un error en el servidor.' }),
+    };
+  }
+};
