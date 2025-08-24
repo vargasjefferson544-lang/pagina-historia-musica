@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historia de la Música</title>
+    <style>
+        /* Estilos Generales y Reset */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e67e22;
+            --background-color: #ecf0f1;
+            --text-color: #34495e;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        /* Contenedor principal */
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            overflow: hidden;
+            padding: 0 20px;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        section {
+            padding: 60px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Encabezado */
+        header {
+            background: var(--primary-color);
+            color: #fff;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Menú de Navegación */
+        nav {
+            background: #34495e;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li a {
+            color: white;
+            padding: 1rem 1.5rem;
+            display: block;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Sección de Introducción */
+        #inicio {
+            text-align: center;
+        }
+
+        /* Línea de Tiempo Interactiva */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .timeline-item {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+
+        .timeline-item-header {
+            padding: 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .timeline-item-content {
+            display: flex;
+            padding: 20px;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease;
+            gap: 20px;
+        }
+        
+        .timeline-item.active .timeline-item-content {
+            max-height: 500px; /* Ajusta según sea necesario */
+            opacity: 1;
+        }
+
+        .timeline-item-content img {
+            max-width: 150px;
+            height: auto;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        /* Compositores */
+        .composers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .composer-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .composer-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .composer-card img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid var(--secondary-color);
+        }
+
+        .composer-card h3 {
+            margin-bottom: 10px;
+        }
+        
+        /* Instrumentos */
+        .instrument-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .instrument-item {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .instrument-item img {
+            width: 80px;
+            height: 80px;
+            transition: transform 0.3s ease;
+        }
+
+        .instrument-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .tooltip {
+            visibility: hidden;
+            width: 160px;
+            background-color: var(--primary-color);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -80px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--primary-color) transparent transparent transparent;
+        }
+
+        .instrument-item:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Curiosidades */
+        #curiosidades ul {
+            list-style: disc;
+            padding-left: 20px;
+        }
+        
+        #curiosidades li {
+            margin-bottom: 10px;
+        }
+
+        .hidden-curiosities {
+            display: none;
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #d35400;
+        }
+
+        /* Quiz */
+        .quiz-container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            background: #f9f9f9;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: 1px solid #ddd;
+        }
+
+        .options li:hover {
+            background-color: #e0e0e0;
+        }
+
+        .options li.correct {
+            background-color: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+        
+        .options li.incorrect {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
+
+        /* Pie de Página */
+        footer {
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 20px;
+        }
+
+        /* Diseño Responsivo */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .timeline-item-content {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .timeline-item-content img {
+                max-width: 120px;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>Historia de la Música</h1>
+        </div>
+    </header>
+
+    <nav id="navbar">
+        <div class="container">
+            <ul>
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#linea-tiempo">Línea de tiempo</a></li>
+                <li><a href="#compositores">Compositores</a></li>
+                <li><a href="#instrumentos">Instrumentos</a></li>
+                <li><a href="#curiosidades">Curiosidades</a></li>
+                <li><a href="#quiz">Quiz</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section id="inicio" class="container">
+        <h2>¿Qué es la Música?</h2>
+        <p>
+            La música es el arte de combinar sonidos de manera agradable al oído, siguiendo una estructura de ritmo, melodía y armonía. A lo largo de la historia, ha sido una de las formas de expresión más importantes de la humanidad, reflejando las emociones, culturas y eventos de cada época. Desde los tambores prehistóricos hasta las complejas sinfonías y la música electrónica actual, su evolución nos cuenta la historia de nuestra propia civilización.
+        </p>
+    </section>
+
+    <section id="linea-tiempo" class="container">
+        <h2>Línea de Tiempo Interactiva</h2>
+        <div class="timeline">
+            <!-- Periodo Prehistoria -->
+            <div class="timeline-item">
+                <div class="timeline-item-header">Prehistoria (50.000 a.C. - 5.000 a.C.)</div>
+                <div class="timeline-item-content">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Lascaux_painting.jpg/640px-Lascaux_painting.jpg" alt="Pintura rupestre">
+                    <p>La música en la prehistoria probablemente surgió de la imitación de sonidos de la naturaleza. Se utilizaban instrumentos rudimentarios como flautas de hueso, tambores de troncos y la propia voz humana para rituales, danzas y comunicación.</p>
+                </div>
+            </div>
+            <!-- Periodo Grecia y Roma -->
+            <div class="timeline-item">
+                <div class="timeline-item-header">Grecia y Roma (800 a.C. - 476 d.C.)</div>
+                <div class="timeline-item-content">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Cithara_player_AM_Athens_8-8-2018_1.jpg/640px-Cithara_player_AM_Athens_8-8-2018_1.jpg" alt="Músico griego">
+                    <p>Para los griegos, la música era una ciencia y un arte fundamental, ligada a la filosofía y las matemáticas. Instrumentos como la lira y el aulos eran populares. Roma adoptó gran parte de la cultura musical griega, usándola en eventos militares y sociales.</p>
+                </div>
+            </div>
+            <!-- Edad Media -->
+            <div class="timeline-item">
+                <div class="timeline-item-header">Edad Media (476 - 1450)</div>
+                <div class="timeline-item-content">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Gradual_of_St._Katharinenthal_-_Walters_W157_-_Full_Page.jpg/640px-Gradual_of_St._Katharinenthal_-_Walters_W157_-_Full_Page.jpg" alt="Manuscrito musical medieval">
+                    <p>Dominada por la música religiosa, el canto gregoriano fue la forma más extendida. Era música vocal y monódica (una sola línea melódica). Hacia el final del periodo, surgió la polifonía, sentando las bases de la música occidental.</p>
+                </div>
+            </div>
+            <!-- Renacimiento -->
+            <div class="timeline-item">
+                <div class="timeline-item-header">Renacimiento (1450 - 1600)</div>
+                <div class="timeline-item-content">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Titian_-_The_Concert_-_WGA22744.jpg/640px-Titian_-_The_Concert_-_WGA22744.jpg" alt="Concierto renacentista">
+                    <p>La polifonía vocal alcanzó su máxima expresión con compositores como Palestrina y Josquin des Prez. La música instrumental ganó importancia y se desarrollaron instrumentos como el laúd y la viola da gamba. La imprenta musical facilitó su difusión.</p>
+                </div>
+            </div>
+            <!-- Barroco -->
+            <div class="timeline-item">
+                <div class="timeline-item-header">Barroco (1600 - 1750)</div>
+                <div class="timeline-item-content">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Johann_Sebastian_Bach.jpg/512px-Johann_Sebastian_Bach.jpg" alt="Johann Sebastian Bach">
+                    <p>Caracterizado por el contraste y la emoción. Nacen la ópera, el oratorio y la sonata. El bajo continuo es una característica fundamental. Compositores como Bach, Vivaldi y Handel llevaron la complejidad musical a nuevos niveles.</p>
+                </div>
+            </div>
+            <!-- Clasicismo -->
+            <div class="timeline-item">
+                <div class="timeline-item-header">Clasicismo (1750 - 1820)</div>
+                <div class="timeline-item-content">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Wolfgang-amadeus-mozart_1.jpg/512px-Wolfgang-amadeus-mozart_1.jpg" alt="Wolfgang Amadeus Mozart">
+                    <p>Buscaba el equilibrio, la claridad y la elegancia. La sinfonía y el concierto se consolidan como las formas principales. Mozart, Haydn y el joven Beethoven son las figuras más destacadas, creando melodías memorables y estructuras formales perfectas.</p>
+                </div>
+            </div>
+             <!-- Romanticismo -->
+            <div class="timeline-item">
+                <div class="timeline-item-header">Romanticismo (1820 - 1900)</div>
+                <div class="timeline-item-content">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Beethoven.jpg/512px-Beethoven.jpg" alt="Ludwig van Beethoven">
+                    <p>La música se vuelve más personal, emocional y expresiva. Se exploran los límites de la armonía y la dinámica. Beethoven es la figura de transición clave. Chopin, Liszt, Wagner y Tchaikovsky expresaron grandes pasiones a través de su música.</p>
+                </div>
+            </div>
+             <!-- Siglo XX y Música Actual -->
+            <div class="timeline-item">
+                <div class="timeline-item-header">Siglo XX y Música Actual</div>
+                <div class="timeline-item-content">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/The_Beatles_in_America.jpg/640px-The_Beatles_in_America.jpg" alt="The Beatles">
+                    <p>Un periodo de ruptura y experimentación. Surgen estilos como el impresionismo, el dodecafonismo y la música electrónica. Posteriormente, nacen el jazz, el rock, el pop y una infinidad de géneros que continúan evolucionando gracias a la tecnología digital.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="compositores" class="container">
+        <h2>Compositores Destacados</h2>
+        <div class="composers-grid">
+            <div class="composer-card">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Johann_Sebastian_Bach.jpg/512px-Johann_Sebastian_Bach.jpg" alt="Bach">
+                <h3>J.S. Bach</h3>
+                <p>Maestro del Barroco, conocido por su compleja polifonía y obras como los Conciertos de Brandeburgo.</p>
+            </div>
+            <div class="composer-card">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Wolfgang-amadeus-mozart_1.jpg/512px-Wolfgang-amadeus-mozart_1.jpg" alt="Mozart">
+                <h3>W.A. Mozart</h3>
+                <p>Prodigio del Clasicismo, autor de más de 600 obras, incluyendo óperas, sinfonías y conciertos.</p>
+            </div>
+            <div class="composer-card">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Beethoven.jpg/512px-Beethoven.jpg" alt="Beethoven">
+                <h3>L. van Beethoven</h3>
+                <p>Figura clave en la transición al Romanticismo, expandió las formas clásicas y expresó una profunda emoción.</p>
+            </div>
+            <div class="composer-card">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Frederic_Chopin_photo.jpg/512px-Frederic_Chopin_photo.jpg" alt="Chopin">
+                <h3>F. Chopin</h3>
+                <p>Poeta del piano, compuso principalmente para este instrumento, destacando por sus nocturnos y polonesas.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="instrumentos" class="container">
+        <h2>Instrumentos por Época</h2>
+        <div class="instrument-gallery">
+            <div class="instrument-item">
+                <img src="https://img.icons8.com/ios/100/000000/lyre.png" alt="Lira">
+                <span class="tooltip">Lira (Grecia Antigua)</span>
+            </div>
+            <div class="instrument-item">
+                <img src="https://img.icons8.com/ios/100/000000/flute.png" alt="Flauta">
+                <span class="tooltip">Flauta de Hueso (Prehistoria)</span>
+            </div>
+            <div class="instrument-item">
+                <img src="https://img.icons8.com/dotty/100/000000/lute.png" alt="Laúd">
+                <span class="tooltip">Laúd (Renacimiento)</span>
+            </div>
+            <div class="instrument-item">
+                <img src="https://img.icons8.com/ios/100/000000/harpsichord.png" alt="Clavicémbalo">
+                <span class="tooltip">Clavicémbalo (Barroco)</span>
+            </div>
+            <div class="instrument-item">
+                <img src="https://img.icons8.com/ios/100/000000/piano.png" alt="Piano">
+                <span class="tooltip">Piano (Clasicismo/Romanticismo)</span>
+            </div>
+            <div class="instrument-item">
+                <img src="https://img.icons8.com/ios/100/000000/electric-guitar.png" alt="Guitarra Eléctrica">
+                <span class="tooltip">Guitarra Eléctrica (Siglo XX)</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="curiosidades" class="container">
+        <h2>Curiosidades Musicales</h2>
+        <ul>
+            <li>El instrumento más antiguo encontrado es una flauta de hueso de hace más de 40.000 años.</li>
+            <li>La Sinfonía nº 9 de Beethoven fue la primera en incluir un coro en un movimiento sinfónico.</li>
+            <li>El término "ópera" significa "obra" en italiano.</li>
+            <div id="more-curiosities" class="hidden-curiosities">
+                <li>Mozart compuso su primera pieza musical a los cinco años.</li>
+                <li>Se dice que el sonido no puede viajar en el vacío del espacio, pero la NASA convirtió las ondas electromagnéticas de los planetas en sonidos audibles.</li>
+            </div>
+        </ul>
+        <button id="btn-curiosities" class="btn">Ver más curiosidades</button>
+    </section>
+    
+    <section id="quiz" class="container">
+        <h2>Quiz Interactivo</h2>
+        <div class="quiz-container">
+            <div id="quiz-content">
+                <!-- Las preguntas se cargarán aquí con JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>Proyecto educativo – Historia de la Música</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Línea de tiempo interactiva
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            timelineItems.forEach(item => {
+                const header = item.querySelector('.timeline-item-header');
+                header.addEventListener('click', () => {
+                    // Cierra todos los demás items
+                    timelineItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                    // Abre o cierra el item actual
+                    item.classList.toggle('active');
+                });
+            });
+
+            // Botón de curiosidades
+            const btnCuriosities = document.getElementById('btn-curiosities');
+            const moreCuriosities = document.getElementById('more-curiosities');
+            btnCuriosities.addEventListener('click', () => {
+                if (moreCuriosities.style.display === 'block') {
+                    moreCuriosities.style.display = 'none';
+                    btnCuriosities.textContent = 'Ver más curiosidades';
+                } else {
+                    moreCuriosities.style.display = 'block';
+                    btnCuriosities.textContent = 'Ocultar curiosidades';
+                }
+            });
+            
+            // Lógica del Quiz
+            const quizData = [
+                {
+                    question: "¿En qué período musical es famoso Johann Sebastian Bach?",
+                    options: ["Clasicismo", "Barroco", "Romanticismo", "Renacimiento"],
+                    answer: "Barroco"
+                },
+                {
+                    question: "¿Qué compositor es conocido por haber seguido componiendo a pesar de su sordera?",
+                    options: ["Mozart", "Chopin", "Beethoven", "Vivaldi"],
+                    answer: "Beethoven"
+                },
+                {
+                    question: "¿Cuál de estos instrumentos es característico del Renacimiento?",
+                    options: ["Piano", "Guitarra eléctrica", "Laúd", "Saxofón"],
+                    answer: "Laúd"
+                }
+            ];
+
+            const quizContent = document.getElementById('quiz-content');
+            let currentQuestionIndex = 0;
+
+            function loadQuiz() {
+                quizContent.innerHTML = ''; // Limpiar contenido anterior
+                const currentQuestion = quizData[currentQuestionIndex];
+                
+                const questionElement = document.createElement('div');
+                questionElement.classList.add('question');
+                questionElement.innerHTML = `<h3>${currentQuestion.question}</h3>`;
+
+                const optionsElement = document.createElement('ul');
+                optionsElement.classList.add('options');
+                
+                currentQuestion.options.forEach(option => {
+                    const li = document.createElement('li');
+                    li.textContent = option;
+                    li.addEventListener('click', () => selectAnswer(li, option, currentQuestion.answer));
+                    optionsElement.appendChild(li);
+                });
+                
+                quizContent.appendChild(questionElement);
+                quizContent.appendChild(optionsElement);
+            }
+
+            function selectAnswer(liElement, selectedOption, correctAnswer) {
+                const options = quizContent.querySelectorAll('.options li');
+                options.forEach(opt => {
+                    opt.style.pointerEvents = 'none'; // Desactivar más clics
+                    if (opt.textContent === correctAnswer) {
+                        opt.classList.add('correct');
+                    }
+                });
+
+                if (selectedOption === correctAnswer) {
+                    liElement.classList.add('correct');
+                } else {
+                    liElement.classList.add('incorrect');
+                }
+
+                // Cargar siguiente pregunta después de un tiempo
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < quizData.length) {
+                        loadQuiz();
+                    } else {
+                        quizContent.innerHTML = `<h3>¡Has completado el quiz!</h3><p>Gracias por participar.</p>`;
+                    }
+                }, 2000);
+            }
+
+            loadQuiz();
+        });
+
+        // Suavizar el scroll al hacer clic en el menú
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
