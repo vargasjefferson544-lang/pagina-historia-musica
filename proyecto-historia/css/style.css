@@ -1,0 +1,294 @@
+:root {
+    --bg-color: #0f172a;
+    --card-color: #1e293b;
+    --text-color: #f8fafc;
+    --muted-text-color: #94a3b8;
+    --accent-color: #f59e0b;
+    --border-color: #334155;
+    --font-heading: 'Montserrat', sans-serif;
+    --font-body: 'Roboto', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.main-header {
+    padding: 4rem 2rem;
+    text-align: center;
+    background: linear-gradient(45deg, #0f172a, #1e293b, #3b2a4f);
+    background-size: 200% 200%;
+    animation: gradientAnimation 15s ease infinite;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-content {
+    animation: fadeIn 1s ease-out;
+}
+
+.main-header h1 {
+    font-family: var(--font-heading);
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.main-header .highlight {
+    color: var(--accent-color);
+}
+
+.main-header p {
+    font-size: 1.2rem;
+    color: var(--muted-text-color);
+    font-weight: 300;
+}
+
+.search-container {
+    padding: 2rem;
+    text-align: center;
+    animation: fadeIn 1s ease-out 0.2s;
+    animation-fill-mode: both; /* Mantiene el estado final de la animación */
+}
+
+#searchInput {
+    width: 60%;
+    max-width: 500px;
+    padding: 1rem;
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 50px;
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#searchInput::placeholder {
+    color: var(--muted-text-color);
+}
+
+#searchInput:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+}
+
+.timeline-container {
+    position: relative;
+    width: 100%;
+    padding: 50px 0;
+    overflow-x: auto;
+    cursor: grab;
+}
+.timeline-container:active { cursor: grabbing; }
+
+/* Línea de tiempo central */
+.timeline-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 3px;
+    background-color: var(--border-color);
+}
+
+.timeline {
+    display: flex;
+    padding: 0 50px;
+    min-width: max-content;
+}
+
+.timeline-item {
+    position: relative;
+    min-width: 320px;
+    padding: 20px 40px;
+    opacity: 0;
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Animación de entrada escalonada */
+.timeline-item:nth-child(1) { animation-delay: 0.3s; }
+.timeline-item:nth-child(2) { animation-delay: 0.5s; }
+.timeline-item:nth-child(3) { animation-delay: 0.7s; }
+.timeline-item:nth-child(4) { animation-delay: 0.9s; }
+.timeline-item:nth-child(5) { animation-delay: 1.1s; }
+.timeline-item:nth-child(6) { animation-delay: 1.3s; }
+.timeline-item:nth-child(7) { animation-delay: 1.5s; }
+.timeline-item:nth-child(8) { animation-delay: 1.7s; }
+.timeline-item:nth-child(9) { animation-delay: 1.9s; }
+
+
+/* Alternar tarjetas arriba y abajo */
+.timeline-item:nth-child(odd) {
+    transform: translateY(-50%);
+    padding-bottom: 0;
+    margin-top: -10px;
+}
+.timeline-item:nth-child(even) {
+    transform: translateY(50%);
+    padding-top: 0;
+    margin-top: 10px;
+}
+
+/* Línea conectora de la tarjeta al punto */
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 50%;
+    width: 2px;
+    background-color: var(--border-color);
+}
+.timeline-item:nth-child(odd)::before { bottom: 0; }
+.timeline-item:nth-child(even)::before { top: 0; }
+
+
+.timeline-dot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 15px;
+    height: 15px;
+    background-color: var(--bg-color);
+    border: 3px solid var(--accent-color);
+    border-radius: 50%;
+    z-index: 1;
+    transition: background-color 0.3s ease;
+}
+
+.timeline-card {
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.timeline-item:hover .timeline-card {
+    transform: scale(1.05);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
+}
+.timeline-item:hover .timeline-dot {
+    background-color: var(--accent-color);
+}
+
+.card-img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-year {
+    display: inline-block;
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.card-title {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.card-inventor {
+    color: var(--muted-text-color);
+    font-weight: 400;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.card-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.card-fun-fact {
+    font-size: 0.9rem;
+    color: var(--muted-text-color);
+    background-color: rgba(0,0,0,0.2);
+    padding: 0.75rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent-color);
+}
+.card-fun-fact b {
+    color: var(--accent-color);
+}
+
+.timeline-item.hide {
+    display: none;
+}
+
+/* Diseño Responsivo para celulares */
+@media (max-width: 768px) {
+    .main-header h1 { font-size: 2.5rem; }
+    
+    /* Cambiar a timeline vertical */
+    .timeline-container {
+        padding: 20px;
+        overflow-x: hidden; /* Deshabilitar scroll horizontal */
+    }
+    .timeline-container::before {
+        left: 20px; /* Mover línea al costado */
+        top: 0;
+        height: 100%;
+        width: 3px;
+        transform: none;
+    }
+    .timeline {
+        flex-direction: column; /* Apilar tarjetas */
+        padding: 0;
+    }
+    .timeline-item, 
+    .timeline-item:nth-child(odd), 
+    .timeline-item:nth-child(even) {
+        transform: none;
+        padding: 20px 0 20px 60px; /* Espacio para la línea y el punto */
+        width: 100%;
+        margin-top: 0;
+    }
+    .timeline-item::before {
+        height: 2px;
+        width: 30px;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    .timeline-dot {
+        left: 20px;
+        top: 50%;
+    }
+}
